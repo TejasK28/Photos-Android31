@@ -1,35 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- activity_main.xml -->
+<!-- Updated activity_main.xml -->
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="16dp">
+    tools:context=".MainActivity">
+
+    <!-- Add this inside your RelativeLayout in activity_main.xml -->
+    <Button
+        android:id="@+id/removeAlbumButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Remove Album"
+        android:layout_below="@id/albumsRecyclerView"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="20dp"/>
+
+
+    <Button
+        android:id="@+id/addAlbumButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Add Album"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="20dp"/>
+
+
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/albumsRecyclerView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_above="@+id/buttonLayout"/>
-
-    <LinearLayout
-        android:id="@+id/buttonLayout"
-        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_centerHorizontal="true"
-        android:layout_alignParentBottom="true">
-
-        <Button
-            android:id="@+id/btnAddAlbum"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Add Album"/>
-
-        <Button
-            android:id="@+id/btnRemoveAlbum"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Remove Album"
-            android:layout_marginStart="10dp"/>
-    </LinearLayout>
-
+        android:layout_below="@id/addAlbumButton"
+        android:layout_marginTop="20dp"/>
 </RelativeLayout>

@@ -1,59 +1,90 @@
 package com.example.androidapp;
-
-import android.content.Context;
+// AlbumsAdapter.java
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import androidx.annotation.NonNull;
+import android.widget.Toast;
 import androidx.recyclerview.widget.RecyclerView;
-
 import java.util.ArrayList;
 
 public class AlbumsAdapter extends RecyclerView.Adapter<AlbumsAdapter.ViewHolder> {
+    private ArrayList<Album> albumsList;
 
-    private Context context;
-    private ArrayList<String> albumNames;
-    private View.OnClickListener onAlbumClickListener;
-
-    public AlbumsAdapter(Context context, ArrayList<String> albumNames, View.OnClickListener onAlbumClickListener) {
-        this.context = context;
-        this.albumNames = albumNames;
-        this.onAlbumClickListener = onAlbumClickListener;
+    public AlbumsAdapter(ArrayList<Album> albums) {
+        this.albumsList = albums;
     }
 
-    @NonNull
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+        public TextView albumNameTextView;
+
+        public ViewHolder(View itemView) {
+            super(itemView);
+            albumNameTextView = itemView.findViewById(R.id.album_name);
+            itemView.setOnClickListener(this); // Set the click listener for the itemView
+        }
+
+        @Override
+        public void onClick(View view) {
+            int position = getAdapterPosition(); // Get the position of the clicked item
+            if (position != RecyclerView.NO_POSITION) {
+                Album clickedAlbum = albumsList.get(position);
+                Toast.makeText(view.getContext(), "Clicked on: " + clickedAlbum.getName(), Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
     @Override
-    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(context).inflate(R.layout.album_item, parent, false);
-        view.setOnClickListener(onAlbumClickListener);
+    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.album_item, parent, false);
         return new ViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        String albumName = albumNames.get(position);
-        holder.textView.setText(albumName);
+    public void onBindViewHolder(ViewHolder holder, int position) {
+        Album album = albumsList.get(position);
+        holder.albumNameTextView.setText(album.getName());
     }
 
     @Override
     public int getItemCount() {
-        return albumNames.size();
+        return albumsList.size();
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
-        TextView textView;
+    // Method to retrieve the list of albums
+    public ArrayList<Album> getAlbums() {
+        return albumsList;
+    }
 
-        ViewHolder(View itemView) {
-            super(itemView);
-            textView = itemView.findViewById(R.id.textView);
+    public boolean addAlbumIfNotExists(String albumName) {
+        for (Album album : albumsList) {
+            if (album.getName().equalsIgnoreCase(albumName)) {
+                return false; // Album already exists
+            }
+        }
+        albumsList.add(new Album(albumName));
+        notifyItemInserted(albumsList.size() - 1);
+        return true;
+    }
+
+    public void removeAlbum(int position) {
+        if (position >= 0 && position < albumsList.size()) {
+            albumsList.remove(position);
+            notifyItemRemoved(position);
         }
     }
 
-    // Method to update the list of albums and notify the adapter of data change
-    public void updateAlbums(ArrayList<String> newAlbumNames) {
-        albumNames.clear();
-        albumNames.addAll(newAlbumNames);
-        notifyDataSetChanged();  // Notify any registered observers that the data set has changed.
+    public String[] getAlbumNames()
+    {
+        String [] names = new String[this.albumsList.size()];
+        int x = 0;
+
+        for(Album a : albumsList)
+        {
+            names[x] = a.getName();
+            ++x;
+        }
+
+        return names;
     }
 }
