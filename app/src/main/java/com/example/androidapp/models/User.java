@@ -17,6 +17,10 @@ public class User implements Serializable {
         return albums;
     }
 
+
+    public Album getAlbum(int position) {
+        return albums.get(position);
+    }
     /**
      * Adds the specified album to the user's album list.
      * The album is only added if it is not null.

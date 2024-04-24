@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import android.content.Intent;
 
 import com.example.androidapp.models.Album;
+import com.example.androidapp.models.CurrentUser;
 
 
 public class AlbumsAdapter extends RecyclerView.Adapter<AlbumsAdapter.ViewHolder> {
@@ -46,6 +47,8 @@ public class AlbumsAdapter extends RecyclerView.Adapter<AlbumsAdapter.ViewHolder
             int position = getAdapterPosition(); // Get the position of the clicked item
             if (position != RecyclerView.NO_POSITION) {
                 Album clickedAlbum = albumsList.get(position);
+                System.out.println("Checking equality in AlbumsAdapter");
+                System.out.println(clickedAlbum == CurrentUser.getInstance().getUser().getAlbums().get(0));
                 Toast.makeText(view.getContext(), "Clicked on: " + clickedAlbum.getName(), Toast.LENGTH_SHORT).show();
 
                 // Create an intent to start ImageActivity
@@ -53,7 +56,7 @@ public class AlbumsAdapter extends RecyclerView.Adapter<AlbumsAdapter.ViewHolder
                 // Add extra data to the intent (e.g., the album's name)
                 intent.putExtra("album_name", clickedAlbum.getName());
                 // Add the entire Album object to the intent
-                intent.putExtra("selected_album", clickedAlbum);
+                intent.putExtra("album_position", position);
 
                 intent.putExtra("index", "" + position);
 

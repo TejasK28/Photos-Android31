@@ -24,7 +24,9 @@ import java.io.InputStream;
 import java.io.IOException;
 import android.net.Uri;
 import java.io.FileNotFoundException;
-
+import android.util.Log;
+import com.example.androidapp.models.CurrentUser;
+import com.example.androidapp.UserUtility;
 
 public class ImagesAdapter extends RecyclerView.Adapter<ImagesAdapter.ViewHolder> {
 
@@ -56,6 +58,7 @@ public class ImagesAdapter extends RecyclerView.Adapter<ImagesAdapter.ViewHolder
                 // Remove the item from the dataset
                 images.remove(position);
                 // Notify the adapter of the item removed
+                UserUtility.saveUser(context, CurrentUser.getInstance().getUser(), "me.ser");
                 notifyItemRemoved(position);
                 notifyItemRangeChanged(position, images.size());
             }
@@ -89,6 +92,7 @@ public class ImagesAdapter extends RecyclerView.Adapter<ImagesAdapter.ViewHolder
                 String newCaption = input.getText().toString();
                 Picture picture = images.get(position);
                 picture.setCaption(newCaption);  // Update the caption
+                UserUtility.saveUser(context, CurrentUser.getInstance().getUser(), "me.ser");
                 notifyItemChanged(position);  // Notify to refresh the item
             }
         });

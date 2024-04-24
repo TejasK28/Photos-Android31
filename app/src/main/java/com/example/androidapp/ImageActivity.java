@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 
 import android.content.DialogInterface;
+import android.content.pm.PackageManager;
 import android.database.CursorWindowAllocationException;
 import android.os.Bundle;
 import android.text.InputType;
@@ -43,7 +44,6 @@ import com.example.androidapp.UserUtility;
 public class ImageActivity extends AppCompatActivity {
     // Existing declarations...
     private static final int PICK_IMAGE_REQUEST = 1;  // Request code for picking an image
-
     private Button searchByDateButton;
 
     private LocalDate startDate, endDate;
@@ -60,8 +60,8 @@ public class ImageActivity extends AppCompatActivity {
         editTextStartDate = findViewById(R.id.editTextStartDate);
         editTextEndDate = findViewById(R.id.editTextEndDate);
 
-        // FIXME: need to find a way to serialize images associated with an album
-        selectedAlbum = (Album) getIntent().getSerializableExtra("selected_album");
+        int albumPosition = getIntent().getIntExtra("album_position", 0);
+        selectedAlbum = CurrentUser.getInstance().getUser().getAlbum(albumPosition);
 
         recyclerViewImages = findViewById(R.id.recyclerViewImages);
         recyclerViewImages.setLayoutManager(new LinearLayoutManager(this));
@@ -139,6 +139,11 @@ public class ImageActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.getData() != null) {
             Uri imageUri = data.getData();
+
+            // Take persistable URI permission to retain access across reboots
+            final int takeFlags = data.getFlags()
+                    & (Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+            getContentResolver().takePersistableUriPermission(imageUri, takeFlags);
             addImageToList(imageUri);
         }
     }
