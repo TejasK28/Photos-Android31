@@ -1,5 +1,6 @@
 package com.example.androidapp;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 
@@ -62,6 +63,13 @@ public class ImageActivity extends AppCompatActivity {
 
         int albumPosition = getIntent().getIntExtra("album_position", 0);
         selectedAlbum = CurrentUser.getInstance().getUser().getAlbum(albumPosition);
+
+
+
+        UserUtility.saveUser(getApplicationContext(), CurrentUser.getInstance().getUser(), "me.ser");
+
+
+        System.out.println("CURRENT IMAGES:" + selectedAlbum.getImages());
 
         recyclerViewImages = findViewById(R.id.recyclerViewImages);
         recyclerViewImages.setLayoutManager(new LinearLayoutManager(this));
@@ -134,6 +142,7 @@ public class ImageActivity extends AppCompatActivity {
         }
     }
 
+    @SuppressLint("WrongConstant")
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -168,6 +177,9 @@ public class ImageActivity extends AppCompatActivity {
                 System.out.println("SelectedAlbum: " + selectedAlbum.getImagesPath());
                 UserUtility.saveUser(getApplicationContext(), CurrentUser.getInstance().getUser(), "me.ser");
                 imagesAdapter.notifyDataSetChanged();
+                System.out.println("CURRENT IMAGES:" + selectedAlbum.getImages());
+
+
             }
         });
         builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
