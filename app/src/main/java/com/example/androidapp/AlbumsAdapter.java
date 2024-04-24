@@ -55,6 +55,8 @@ public class AlbumsAdapter extends RecyclerView.Adapter<AlbumsAdapter.ViewHolder
                 // Add the entire Album object to the intent
                 intent.putExtra("selected_album", clickedAlbum);
 
+                intent.putExtra("index", "" + position);
+
                 view.getContext().startActivity(intent); // Start the AlbumActivity
             }
         }

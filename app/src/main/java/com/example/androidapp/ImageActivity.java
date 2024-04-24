@@ -32,6 +32,8 @@ import java.util.List;
 import android.content.Intent;
 import android.net.Uri;
 import android.provider.MediaStore;
+import android.widget.Toast;
+
 import com.example.androidapp.UserUtility;
 
 
@@ -43,6 +45,7 @@ public class ImageActivity extends AppCompatActivity {
     private static final int PICK_IMAGE_REQUEST = 1;  // Request code for picking an image
 
     private Button searchByDateButton;
+
     private LocalDate startDate, endDate;
     private EditText editTextStartDate;
     private EditText editTextEndDate;
@@ -112,13 +115,16 @@ public class ImageActivity extends AppCompatActivity {
     }
 
     private void launchSlideshowActivity() {
-        ArrayList<String> imagePaths = selectedAlbum.getImagesPath();
-        // Assuming you have a method to fill imagePaths from selected album
+        ArrayList<String> imagePaths = new ArrayList<>();
         fillImagePathsFromSelectedAlbum(imagePaths);
 
-        Intent intent = new Intent(this, SlideshowActivity.class);
-        intent.putStringArrayListExtra("imagePaths", imagePaths);
-        startActivity(intent);
+        if (imagePaths.isEmpty()) {
+            Toast.makeText(this, "There are no images in the album to display in a slideshow.", Toast.LENGTH_LONG).show();
+        } else {
+            Intent intent = new Intent(this, SlideshowActivity.class);
+            intent.putStringArrayListExtra("imagePaths", imagePaths);
+            startActivity(intent);
+        }
     }
 
     private void fillImagePathsFromSelectedAlbum(ArrayList<String> imagePaths) {

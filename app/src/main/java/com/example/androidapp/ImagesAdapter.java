@@ -1,5 +1,6 @@
 package com.example.androidapp;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.text.InputType;
@@ -42,7 +43,7 @@ public class ImagesAdapter extends RecyclerView.Adapter<ImagesAdapter.ViewHolder
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
+    public void onBindViewHolder(ViewHolder holder, @SuppressLint("RecyclerView") int position) {
         Picture picture = images.get(position);
         new LoadImage(holder.imageViewPicture, context).execute(picture.getImagePath());
         holder.textViewImageName.setText(new java.io.File(picture.getImagePath()).getName());
