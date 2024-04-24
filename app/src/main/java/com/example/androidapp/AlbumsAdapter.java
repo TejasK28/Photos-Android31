@@ -7,6 +7,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
+import android.content.Intent;
+
+import com.example.androidapp.models.Album;
+
 
 public class AlbumsAdapter extends RecyclerView.Adapter<AlbumsAdapter.ViewHolder> {
     private ArrayList<Album> albumsList;
@@ -30,6 +34,15 @@ public class AlbumsAdapter extends RecyclerView.Adapter<AlbumsAdapter.ViewHolder
             if (position != RecyclerView.NO_POSITION) {
                 Album clickedAlbum = albumsList.get(position);
                 Toast.makeText(view.getContext(), "Clicked on: " + clickedAlbum.getName(), Toast.LENGTH_SHORT).show();
+
+                // Create an intent to start ImageActivity
+                Intent intent = new Intent(view.getContext(), ImageActivity.class);
+                // Add extra data to the intent (e.g., the album's name)
+                intent.putExtra("album_name", clickedAlbum.getName());
+                // Add the entire Album object to the intent
+                intent.putExtra("selected_album", clickedAlbum);
+
+                view.getContext().startActivity(intent); // Start the AlbumActivity
             }
         }
     }

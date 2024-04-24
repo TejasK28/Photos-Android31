@@ -1,18 +1,23 @@
 package com.example.androidapp;
 
 import android.content.SharedPreferences;
+import android.database.CursorWindowAllocationException;
 import android.os.Bundle;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import android.view.View;
+
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+
+import com.example.androidapp.models.Album;
+import com.example.androidapp.models.User;
+import com.example.androidapp.models.CurrentUser;
+
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+
 
 public class MainActivity extends AppCompatActivity {
     private RecyclerView albumsRecyclerView;
@@ -20,6 +25,10 @@ public class MainActivity extends AppCompatActivity {
     private Button addAlbumButton;
     private Button removeAlbumButton;
     private SharedPreferences sharedPreferences;
+
+    private User user;
+
+    private ArrayList<Album> albums;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,33 +40,18 @@ public class MainActivity extends AppCompatActivity {
         removeAlbumButton = findViewById(R.id.removeAlbumButton);
 
         sharedPreferences = getSharedPreferences("AlbumsPrefs", MODE_PRIVATE);
-        ArrayList<Album> albums = loadAlbums(); // Load albums from SharedPreferences
+
+        // loadUser
+        user = UserUtility.loadUser(getApplicationContext(), "me.ser");
+        CurrentUser.getInstance().setUser(user);
+
+        albums = CurrentUser.getInstance().getUser().getAlbums();
         albumsAdapter = new AlbumsAdapter(albums);
         albumsRecyclerView.setAdapter(albumsAdapter);
         albumsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         addAlbumButton.setOnClickListener(v -> showAddAlbumDialog());
         removeAlbumButton.setOnClickListener(v -> handleRemoveAlbum());
-    }
-
-    private ArrayList<Album> loadAlbums() {
-        String savedAlbums = sharedPreferences.getString("albums", "");
-        ArrayList<Album> albums = new ArrayList<>();
-        if (!savedAlbums.isEmpty()) {
-            String[] albumNames = savedAlbums.split(";");
-            for (String name : albumNames) {
-                albums.add(new Album(name));
-            }
-        }
-        return albums;
-    }
-
-    private void saveAlbums(ArrayList<Album> albums) {
-        StringBuilder sb = new StringBuilder();
-        for (Album album : albums) {
-            sb.append(album.getName()).append(";");
-        }
-        sharedPreferences.edit().putString("albums", sb.toString()).apply();
     }
 
     private void showAddAlbumDialog() {
@@ -71,7 +65,8 @@ public class MainActivity extends AppCompatActivity {
         builder.setPositiveButton("Add", (dialog, which) -> {
             String albumName = input.getText().toString().trim();
             if (!albumName.isEmpty() && albumsAdapter.addAlbumIfNotExists(albumName)) {
-                saveAlbums(albumsAdapter.getAlbums()); // Save albums after adding
+                // Saving albums
+                UserUtility.saveUser(getApplicationContext(), CurrentUser.getInstance().getUser(), "me.ser");
                 Toast.makeText(MainActivity.this, albumName + " album added", Toast.LENGTH_SHORT).show();
             } else {
                 Toast.makeText(MainActivity.this, "Album already exists or invalid name", Toast.LENGTH_SHORT).show();
@@ -88,7 +83,7 @@ public class MainActivity extends AppCompatActivity {
         builder.setTitle("Pick an album to remove");
         builder.setItems(albumNames, (dialog, which) -> {
             albumsAdapter.removeAlbum(which);
-            saveAlbums(albumsAdapter.getAlbums()); // Save albums after removal
+            UserUtility.saveUser(getApplicationContext(), CurrentUser.getInstance().getUser(), "me.ser");
             Toast.makeText(MainActivity.this, "Album removed", Toast.LENGTH_SHORT).show();
         });
         builder.show();
