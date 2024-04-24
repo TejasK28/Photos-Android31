@@ -3,6 +3,7 @@ package com.example.androidapp;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.recyclerview.widget.RecyclerView;
@@ -21,11 +22,23 @@ public class AlbumsAdapter extends RecyclerView.Adapter<AlbumsAdapter.ViewHolder
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         public TextView albumNameTextView;
+        public Button renameButton; // Added button for renaming
 
         public ViewHolder(View itemView) {
             super(itemView);
             albumNameTextView = itemView.findViewById(R.id.album_name);
             itemView.setOnClickListener(this); // Set the click listener for the itemView
+            renameButton = itemView.findViewById(R.id.renameButton); // Find the button in the layout
+            renameButton.setOnClickListener(v -> renameAlbum(getAdapterPosition())); // Setting up the click listener
+        }
+
+        private void renameAlbum(int position) {
+            if (position != RecyclerView.NO_POSITION) {
+                Album album = albumsList.get(position);
+                if (itemView.getContext() instanceof MainActivity) {
+                    ((MainActivity) itemView.getContext()).showRenameDialog(album, position);
+                }
+            }
         }
 
         @Override
@@ -57,6 +70,7 @@ public class AlbumsAdapter extends RecyclerView.Adapter<AlbumsAdapter.ViewHolder
     public void onBindViewHolder(ViewHolder holder, int position) {
         Album album = albumsList.get(position);
         holder.albumNameTextView.setText(album.getName());
+
     }
 
     @Override

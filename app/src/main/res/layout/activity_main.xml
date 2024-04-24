@@ -8,25 +8,22 @@
     tools:context=".MainActivity">
 
     <!-- Add this inside your RelativeLayout in activity_main.xml -->
+
+
     <Button
         android:id="@+id/removeAlbumButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Remove Album"
         android:layout_below="@id/albumsRecyclerView"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="20dp"/>
-
+        android:layout_marginTop="51dp"
+        android:text="Remove Album" />
 
     <Button
         android:id="@+id/addAlbumButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Add Album"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="20dp"/>
-
-
+        android:layout_marginTop="20dp"
+        android:text="Add Album" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/albumsRecyclerView"
@@ -34,4 +31,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/addAlbumButton"
         android:layout_marginTop="20dp"/>
+
+
+
 </RelativeLayout>
