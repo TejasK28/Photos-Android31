@@ -20,6 +20,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.androidapp.models.Picture;
 
+import java.text.BreakIterator;
 import java.util.List;
 import java.io.InputStream;
 import java.io.IOException;
@@ -52,6 +53,7 @@ public class ImagesAdapter extends RecyclerView.Adapter<ImagesAdapter.ViewHolder
         holder.textViewImageName.setText(new java.io.File(picture.getImagePath()).getName());
         holder.textViewCaption.setText(picture.getCaption());
         holder.textViewDate.setText(picture.getCaptureDate());
+      
 
         holder.deleteButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -64,6 +66,19 @@ public class ImagesAdapter extends RecyclerView.Adapter<ImagesAdapter.ViewHolder
                 notifyItemRangeChanged(position, images.size());
             }
         });
+
+        // Set tags if they exist
+        if (picture.getTagPersonValue() != null && !picture.getTagPersonValue().isEmpty()) {
+            holder.textViewPersonTag.setText("Person: " + picture.getTagPersonValue());
+        } else {
+            holder.textViewPersonTag.setText(""); // Clear if no tag
+        }
+
+        if (picture.getTagLocationValue() != null && !picture.getTagLocationValue().isEmpty()) {
+            holder.textViewLocationTag.setText("Location: " + picture.getTagLocationValue());
+        } else {
+            holder.textViewLocationTag.setText(""); // Clear if no tag
+        }
     }
 
     @Override
@@ -114,8 +129,8 @@ public class ImagesAdapter extends RecyclerView.Adapter<ImagesAdapter.ViewHolder
         public Button deleteButton;
 
         public Button manageTagsButton;
-
-
+        TextView textViewPersonTag;
+        TextView textViewLocationTag;
 
         public ViewHolder(View itemView) {
             super(itemView);
@@ -126,6 +141,9 @@ public class ImagesAdapter extends RecyclerView.Adapter<ImagesAdapter.ViewHolder
             deleteButton = itemView.findViewById(R.id.deleteButton);  // Add this line
             manageTagsButton = itemView.findViewById(R.id.manageTagsButton);
             manageTagsButton.setOnClickListener(v -> showAddTagDialog());
+
+            textViewPersonTag = itemView.findViewById(R.id.textViewPersonTag);
+            textViewLocationTag = itemView.findViewById(R.id.textViewLocationTag);
 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
