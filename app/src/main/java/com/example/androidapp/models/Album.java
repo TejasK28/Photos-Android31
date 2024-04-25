@@ -312,4 +312,10 @@ public class Album implements Serializable {
         return String.format("From %s to %s", earliest.toString(), latest.toString());
     }
 
+    public void removeImage(Picture picture) {
+
+        pictures.removeIf(p -> p.equals(picture));  // Using stream-like operation directly
+    }
+
+
 }

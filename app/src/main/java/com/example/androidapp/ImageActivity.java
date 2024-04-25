@@ -55,13 +55,15 @@ public class ImageActivity extends AppCompatActivity {
     private RecyclerView recyclerViewImages;
     private ImagesAdapter imagesAdapter;
 
+    public Button moveImageButton;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.image_view);
         editTextStartDate = findViewById(R.id.editTextStartDate);
         editTextEndDate = findViewById(R.id.editTextEndDate);
-
+        moveImageButton = findViewById(R.id.moveImageButton);
 
 
         int albumPosition = getIntent().getIntExtra("album_position", 0);
@@ -69,7 +71,7 @@ public class ImageActivity extends AppCompatActivity {
 
 
 
-        UserUtility.saveUser(getApplicationContext(), CurrentUser.getInstance().getUser(), "me.ser");
+        UserUtility.saveUser(ImageActivity.this, CurrentUser.getInstance().getUser(), "me.ser");
 
 
         System.out.println("CURRENT IMAGES:" + selectedAlbum.getImages());
@@ -116,6 +118,112 @@ public class ImageActivity extends AppCompatActivity {
                 showEndDatePickerDialog();
             }
         });
+
+
+        moveImageButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showSelectPictureDialog();
+            }
+
+            private void showSelectPictureDialog() {
+                final String[] imageNames = selectedAlbum.getImages().stream()
+                        .map(p -> p.getCaption()) // Assuming getImageName() returns a user-friendly name.
+                        .toArray(String[]::new);
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(ImageActivity.this);
+                builder.setTitle("Select a Picture to Move");
+
+                builder.setItems(imageNames, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Picture selectedPicture = selectedAlbum.getImages().get(which);
+                        showSelectAlbumDialog(selectedPicture);
+                    }
+
+                    private void showSelectAlbumDialog(final Picture pictureToMove) {
+                        User user = CurrentUser.getInstance().getUser();
+                        List<Album> allAlbums = user.getAlbums();
+                        ArrayList<String> albumNames = new ArrayList<>();
+
+                        for (Album album : allAlbums) {
+                            if (!album.equals(selectedAlbum)) {
+                                albumNames.add(album.getName());
+                            }
+                        }
+
+                        if (albumNames.isEmpty()) {
+                            Toast.makeText(ImageActivity.this, "There's only one album.", Toast.LENGTH_LONG).show();
+                            return;
+                        }
+
+                        final CharSequence[] albumsArray = albumNames.toArray(new CharSequence[0]);
+
+                        AlertDialog.Builder builder = new AlertDialog.Builder(ImageActivity.this);
+                        builder.setTitle("Select an Album to Move to");
+                        builder.setItems(albumsArray, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                String selectedAlbumName = albumsArray[which].toString(); // This will get the name of the album
+                                System.out.println("ALBUM SELECTED: " + selectedAlbumName);
+
+                                // Fetch the Album object based on the name
+                                Album targetAlbum = allAlbums.stream()
+                                        .filter(album -> album.getName().equals(selectedAlbumName))
+                                        .findFirst()
+                                        .orElse(null);
+
+                                if (targetAlbum != null) {
+                                    movePictureToAlbum(pictureToMove, targetAlbum);
+                                } else {
+                                    Toast.makeText(ImageActivity.this, "Selected album not found.", Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        });
+
+
+                        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.cancel();
+                            }
+                        });
+
+                        AlertDialog dialog = builder.create();
+                        dialog.show();
+                    }
+
+                    private void movePictureToAlbum(Picture picture, Album targetAlbum) {
+                        selectedAlbum.removeImage(picture); // Assumes method to remove image
+                        targetAlbum.addImage(picture); // Assumes method to add image
+                        UserUtility.saveUser(ImageActivity.this, CurrentUser.getInstance().getUser(), "me.ser");
+                        imagesAdapter.notifyDataSetChanged();
+                        Toast.makeText(ImageActivity.this, "Image moved successfully!", Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+
+                AlertDialog dialog = builder.create();
+                if (imageNames.length > 0) {
+                    dialog.show();
+                } else {
+                    Toast.makeText(ImageActivity.this, "No images available to move.", Toast.LENGTH_LONG).show();
+                }
+            }
+
+        });
+
+
+
+
+
+
     }
 
     private void openImageSelector() {
@@ -178,7 +286,7 @@ public class ImageActivity extends AppCompatActivity {
                 Picture newPicture = new Picture(imageUri.toString(), caption);
                 selectedAlbum.addImage(newPicture);
                 System.out.println("SelectedAlbum: " + selectedAlbum.getImagesPath());
-                UserUtility.saveUser(getApplicationContext(), CurrentUser.getInstance().getUser(), "me.ser");
+                UserUtility.saveUser(ImageActivity.this, CurrentUser.getInstance().getUser(), "me.ser");
                 imagesAdapter.notifyDataSetChanged();
                 System.out.println("CURRENT IMAGES:" + selectedAlbum.getImages());
 
