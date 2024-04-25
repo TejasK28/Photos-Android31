@@ -184,12 +184,22 @@ public class Picture implements Serializable {
 
     public void setTagPersonValue(String val)
     {
-        this.personValue = val;
+        if (!val.equals("")) {
+            this.personValue = val;
+        } else
+        {
+            this.personValue = null;
+        }
+
     }
 
-    public void setTagLocationValue(String val)
-    {
-        this.locationValue = val;
+    public void setTagLocationValue(String val) {
+        if (!val.equals("")) {
+            this.locationValue = val;
+        } else
+        {
+            this.locationValue = null;
+        }
     }
 
     public String getTagPersonValue() {

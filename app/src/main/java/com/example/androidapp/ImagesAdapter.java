@@ -182,12 +182,8 @@ public class ImagesAdapter extends RecyclerView.Adapter<ImagesAdapter.ViewHolder
         private void addTag(String personTag, String locationTag, int position) {
             Picture picture = images.get(position);
 
-            if (!personTag.equals("")) {
-                picture.setTagPersonValue(personTag);
-            }
-            if (!locationTag.equals("")) {
-                picture.setTagLocationValue(locationTag);
-            }
+            picture.setTagPersonValue(personTag);
+            picture.setTagLocationValue(locationTag);
 
             UserUtility.saveUser(context, CurrentUser.getInstance().getUser(), "me.ser");
             notifyItemChanged(position);  // Notify to refresh the item
