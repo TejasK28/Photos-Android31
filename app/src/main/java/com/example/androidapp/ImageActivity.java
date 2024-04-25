@@ -27,10 +27,13 @@ import com.example.androidapp.models.User;
 import com.example.androidapp.models.CurrentUser;
 
 
+import java.util.HashMap;
 import java.util.Locale;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
+
 import android.content.Intent;
 import android.net.Uri;
 import android.provider.MediaStore;
@@ -38,6 +41,8 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.example.androidapp.UserUtility;
+
+import org.w3c.dom.Text;
 
 
 // If you're using LocalDate which is available from API 26
@@ -55,7 +60,69 @@ public class ImageActivity extends AppCompatActivity {
     private RecyclerView recyclerViewImages;
     private ImagesAdapter imagesAdapter;
 
+    public Button searchButton;
+
     public Button moveImageButton;
+
+    private EditText tagTextField;
+
+
+
+
+    private HashMap<String, List<String>> parseSearchQuery(String query) {
+        HashMap<String, List<String>> tags = new HashMap<>();
+        query = query.toLowerCase(Locale.ROOT).trim();
+
+        String[] conditions = query.split("\\s+or\\s+");
+
+        for (String condition : conditions) {
+            String[] parts = condition.split("=");
+            if (parts.length == 2) {
+                String key = parts[0].trim();
+                String value = parts[1].trim();
+                tags.computeIfAbsent(key, k -> new ArrayList<>()).add(value);
+            }
+        }
+
+        return tags;
+    }
+
+
+
+    private void searchImages() {
+        String query = tagTextField.getText().toString();
+        if (query.trim().isEmpty()) {
+            imagesAdapter = new ImagesAdapter(this, selectedAlbum.getImages());
+            recyclerViewImages.setAdapter(imagesAdapter);
+            return;
+        }
+
+        HashMap<String, List<String>> tags = parseSearchQuery(query);
+        List<Picture> filteredPictures = new ArrayList<>();
+        for (Album album : CurrentUser.getInstance().getUser().getAlbums()) {
+            for (Picture picture : album.getImages()) {
+                boolean personMatches = checkMatches(picture.getTagPersonValue(), tags.get("person"));
+                boolean locationMatches = checkMatches(picture.getTagLocationValue(), tags.get("location"));
+
+                if (personMatches || locationMatches) {
+                    filteredPictures.add(picture);
+                }
+            }
+        }
+
+        imagesAdapter = new ImagesAdapter(this, filteredPictures);
+        recyclerViewImages.setAdapter(imagesAdapter);
+    }
+
+    private boolean checkMatches(String tagValue, List<String> values) {
+        if (values == null || tagValue == null) return false;
+        return values.stream().anyMatch(value -> tagValue.equalsIgnoreCase(value));
+    }
+
+
+
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,6 +131,18 @@ public class ImageActivity extends AppCompatActivity {
         editTextStartDate = findViewById(R.id.editTextStartDate);
         editTextEndDate = findViewById(R.id.editTextEndDate);
         moveImageButton = findViewById(R.id.moveImageButton);
+        searchButton = findViewById(R.id.searchButton);
+        tagTextField = findViewById(R.id.tagTextField);
+
+        searchButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                searchImages();
+            }
+        });
+
+
+
 
 
         int albumPosition = getIntent().getIntExtra("album_position", 0);
