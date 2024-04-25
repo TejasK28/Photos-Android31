@@ -34,6 +34,7 @@ import java.util.List;
 import android.content.Intent;
 import android.net.Uri;
 import android.provider.MediaStore;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.example.androidapp.UserUtility;
@@ -60,6 +61,8 @@ public class ImageActivity extends AppCompatActivity {
         setContentView(R.layout.image_view);
         editTextStartDate = findViewById(R.id.editTextStartDate);
         editTextEndDate = findViewById(R.id.editTextEndDate);
+
+
 
         int albumPosition = getIntent().getIntExtra("album_position", 0);
         selectedAlbum = CurrentUser.getInstance().getUser().getAlbum(albumPosition);
@@ -230,5 +233,8 @@ public class ImageActivity extends AppCompatActivity {
                 }, year, month, day);
         datePickerDialog.show();
     }
+
+
+
 
 }

@@ -13,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Button;
 import androidx.recyclerview.widget.RecyclerView;
@@ -112,6 +113,8 @@ public class ImagesAdapter extends RecyclerView.Adapter<ImagesAdapter.ViewHolder
         public TextView textViewImageName, textViewCaption, textViewDate;
         public Button deleteButton;
 
+        public Button manageTagsButton;
+
 
 
         public ViewHolder(View itemView) {
@@ -121,6 +124,9 @@ public class ImagesAdapter extends RecyclerView.Adapter<ImagesAdapter.ViewHolder
             textViewCaption = itemView.findViewById(R.id.textViewCaption);
             textViewDate = itemView.findViewById(R.id.textViewDate);
             deleteButton = itemView.findViewById(R.id.deleteButton);  // Add this line
+            manageTagsButton = itemView.findViewById(R.id.manageTagsButton);
+            manageTagsButton.setOnClickListener(v -> showAddTagDialog());
+
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -132,6 +138,63 @@ public class ImagesAdapter extends RecyclerView.Adapter<ImagesAdapter.ViewHolder
                 }
             });
         }
+
+        private void showAddTagDialog() {
+            AlertDialog.Builder builder = new AlertDialog.Builder(itemView.getContext());
+            builder.setTitle("Add Tag");
+
+            // Retrieve the current picture based on adapter position
+            int position = getAdapterPosition();
+            Picture picture = images.get(position);
+
+            // Set up the input fields
+            final EditText inputPerson = new EditText(itemView.getContext());
+            inputPerson.setHint("Person Tag");
+            final EditText inputLocation = new EditText(itemView.getContext());
+            inputLocation.setHint("Location Tag");
+
+            // Pre-set existing tag values if they exist
+            if (picture.getTagPersonValue() != null && !picture.getTagPersonValue().isEmpty()) {
+                inputPerson.setText(picture.getTagPersonValue());
+            }
+            if (picture.getTagLocationValue() != null && !picture.getTagLocationValue().isEmpty()) {
+                inputLocation.setText(picture.getTagLocationValue());
+            }
+
+            LinearLayout layout = new LinearLayout(itemView.getContext());
+            layout.setOrientation(LinearLayout.VERTICAL);
+            layout.addView(inputPerson);
+            layout.addView(inputLocation);
+            builder.setView(layout);
+
+            // Set up the buttons
+            builder.setPositiveButton("Add", (dialog, which) -> {
+                String personTag = inputPerson.getText().toString();
+                String locationTag = inputLocation.getText().toString();
+                addTag(personTag, locationTag, position);  // Include position in the method call
+            });
+            builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
+
+            builder.show();
+        }
+
+
+        private void addTag(String personTag, String locationTag, int position) {
+            Picture picture = images.get(position);
+
+            if (!personTag.equals("")) {
+                picture.setTagPersonValue(personTag);
+            }
+            if (!locationTag.equals("")) {
+                picture.setTagLocationValue(locationTag);
+            }
+
+            UserUtility.saveUser(context, CurrentUser.getInstance().getUser(), "me.ser");
+            notifyItemChanged(position);  // Notify to refresh the item
+
+            System.out.println("TAGS SET: " + "PERSON: " + personTag + " AND LOCATION: " + locationTag);
+        }
+
     }
 
     // AsyncTask to load images in the background

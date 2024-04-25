@@ -36,6 +36,10 @@ public class Picture implements Serializable {
      */
     private String captureDate; // Optional: field for capture date
 
+    public String personValue;
+    public String locationValue;
+
+
     /**
      * Constructs a new Picture with the specified image path and caption.
      * Initializes the tags list.
@@ -47,6 +51,8 @@ public class Picture implements Serializable {
         this.imagePath = imagePath;
         this.tags = new ArrayList<Tag>(); // Initialize tags as an empty list
         this.caption = caption;
+        personValue = null;
+        locationValue =null;
     }
 
     public Picture(String imagePath) {
@@ -69,6 +75,9 @@ public class Picture implements Serializable {
 
         // Log the image path to verify it
         System.out.println("Image path set to: " + imagePath);
+
+        personValue = null;
+        locationValue =null;
     }
 
 
@@ -173,5 +182,22 @@ public class Picture implements Serializable {
                 .anyMatch(tag -> tag.getName().equalsIgnoreCase(tagName));
     }
 
+    public void setTagPersonValue(String val)
+    {
+        this.personValue = val;
+    }
+
+    public void setTagLocationValue(String val)
+    {
+        this.locationValue = val;
+    }
+
+    public String getTagPersonValue() {
+        return personValue;
+    }
+
+    public String getTagLocationValue() {
+        return locationValue;
+    }
 }
 
