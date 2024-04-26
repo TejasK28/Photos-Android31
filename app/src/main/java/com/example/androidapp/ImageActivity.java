@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -13,6 +14,7 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -30,6 +32,7 @@ import com.example.androidapp.models.User;
 import com.example.androidapp.models.CurrentUser;
 
 
+import java.util.HashSet;
 import java.util.Locale;
 import java.util.List;
 import java.util.Set;
@@ -344,7 +347,7 @@ public class ImageActivity extends AppCompatActivity {
                         targetAlbum.addImage(picture); // Assumes method to add image
                         UserUtility.saveUser(ImageActivity.this, CurrentUser.getInstance().getUser(), "me.ser");
                         imagesAdapter.notifyDataSetChanged();
-                        Toast.makeText(ImageActivity.this, "Image moved successfully!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(ImageActivity.this, "Image moved successfully! Please refresh view.", Toast.LENGTH_SHORT).show();
                     }
                 });
 
@@ -464,18 +467,32 @@ public class ImageActivity extends AppCompatActivity {
 
 
     private void createNewAlbum(String albumName, List<Picture> pictures) {
-        Album newAlbum = new Album(albumName, pictures);
+        Album newAlbum = new Album(albumName, new ArrayList<>());  // Start with an empty album
 
-        // FIXME find a way to update the album view after creating an album
+        // Use a HashSet to track filenames for uniqueness
+        Set<String> existingFilenames = new HashSet<>();
 
-        // Update the RecyclerView to reflect the new album
-        //AlbumsAdapter.albumsList.add(newAlbum);
-        CurrentUser.getInstance().getUser().getAlbums().add(newAlbum);
-        UserUtility.saveUser(this, CurrentUser.getInstance().getUser(), "me.ser");
+        for (Picture picture : pictures) {
+            String filename = new File(Uri.parse(picture.getImagePath()).getPath()).getName();
+            if (!existingFilenames.contains(filename)) {
+                newAlbum.addImage(picture);  // Add the image if its filename is not yet in the set
+                existingFilenames.add(filename);  // Add the filename to the set
+            } else {
+                Log.d("DuplicateCheck", "Duplicate image skipped: " + filename);
+            }
+        }
 
+        if (!newAlbum.getImages().isEmpty()) {
+            CurrentUser.getInstance().getUser().getAlbums().add(newAlbum);
+            UserUtility.saveUser(this, CurrentUser.getInstance().getUser(), "me.ser");
+            Toast.makeText(this, "New album created: " + albumName + " with " + newAlbum.getImages().size() + " unique images.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Please refresh album view via button", Toast.LENGTH_SHORT).show();
 
-        Toast.makeText(this, "New album created: " + albumName, Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(this, "No unique images to create a new album.", Toast.LENGTH_SHORT).show();
+        }
     }
+
 
 
 
