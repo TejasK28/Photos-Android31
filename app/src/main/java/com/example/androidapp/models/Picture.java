@@ -209,5 +209,15 @@ public class Picture implements Serializable {
     public String getTagLocationValue() {
         return locationValue;
     }
+
+    public ArrayList<String> getAllPersonTagValues() {
+        // TODO: Implement This. Return all person tag values.
+        return null;
+    }
+
+    public ArrayList<String> getAllLocationTagValues() {
+        // TODO: Implement this. Return all location tag values.
+        return null;
+    }
 }
 

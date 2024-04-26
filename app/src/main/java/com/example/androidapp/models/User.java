@@ -4,6 +4,8 @@ import com.example.androidapp.models.Album;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 public class User implements Serializable {
     private static final long serialVersionUID = 1L;
@@ -51,7 +53,24 @@ public class User implements Serializable {
         this.albums = albums;
     }
 
+    public Set<String> getAllPersonTagValues() {
+        Set<String> allPersonTags = new HashSet<>();
+        for (Album album : albums) {
+            for (Picture picture : album.getImages()) {
+                allPersonTags.addAll(picture.getAllPersonTagValues());
+            }
+        }
+        return allPersonTags;
+    }
 
-
+    public Set<String> getAllLocationTagValues() {
+        Set<String> allLocationTags = new HashSet<>();
+        for (Album album : albums) {
+            for (Picture picture : album.getImages()) {
+                allLocationTags.addAll(picture.getAllLocationTagValues());
+            }
+        }
+        return allLocationTags;
+    }
 
 }
