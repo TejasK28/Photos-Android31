@@ -8,16 +8,16 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 
-import android.content.Context;
 import android.content.DialogInterface;
-import android.content.pm.PackageManager;
-import android.database.CursorWindowAllocationException;
 import android.os.Bundle;
+import android.text.Editable;
 import android.text.InputType;
+import android.text.TextWatcher;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
+import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -30,24 +30,14 @@ import com.example.androidapp.models.User;
 import com.example.androidapp.models.CurrentUser;
 
 
-import java.util.HashMap;
 import java.util.Locale;
-
-import java.time.LocalDate;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.Set;
 
 import android.content.Intent;
 import android.net.Uri;
-import android.provider.MediaStore;
-import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.Toast;
-
-import com.example.androidapp.UserUtility;
-
-import org.w3c.dom.Text;
 
 
 // If you're using LocalDate which is available from API 26
@@ -58,9 +48,6 @@ public class ImageActivity extends AppCompatActivity {
     private Button createAlbumButton; // Button to create album from search results
 
     private static final int PICK_IMAGE_REQUEST = 1;  // Request code for picking an image
-    private Button searchByDateButton;
-
-    private LocalDate startDate, endDate;
     private EditText editTextStartDate;
     private EditText editTextEndDate;
     private Album selectedAlbum;
@@ -71,10 +58,10 @@ public class ImageActivity extends AppCompatActivity {
 
     public Button moveImageButton;
 
-
-    private EditText personEditText;
     private Spinner filterSpinner;
-    private EditText locationEditText;
+
+    AutoCompleteTextView personAutoCompleteTextView;
+    AutoCompleteTextView locationAutoCompleteTextView;
 
     public boolean doesPictureHaveTag(Picture p, String whichTag, String desiredValue)
     {
@@ -88,8 +75,8 @@ public class ImageActivity extends AppCompatActivity {
 
     private void searchImages() {
         String selectedLogic = filterSpinner.getSelectedItem().toString();
-        String personTags = personEditText.getText().toString().trim();
-        String locationTags = locationEditText.getText().toString().trim();
+        String personTags = personAutoCompleteTextView.getText().toString().trim();
+        String locationTags = locationAutoCompleteTextView.getText().toString().trim();
 
         if(selectedLogic.equals("AND"))
         {
@@ -202,15 +189,15 @@ public class ImageActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.image_view);
-        editTextStartDate = findViewById(R.id.editTextStartDate);
-        editTextEndDate = findViewById(R.id.editTextEndDate);
         moveImageButton = findViewById(R.id.moveImageButton);
         searchButton = findViewById(R.id.searchButton);
 
-        personEditText = findViewById(R.id.personEditText);
         filterSpinner = findViewById(R.id.filterSpinner);
-        locationEditText = findViewById(R.id.locationEditText);
 
+        personAutoCompleteTextView = findViewById(R.id.personEditText);
+        locationAutoCompleteTextView = findViewById(R.id.locationEditText);
+
+        setupAutoCompleteTextViews();
         setupFilterSpinner();
 
 
@@ -234,9 +221,6 @@ public class ImageActivity extends AppCompatActivity {
                 }
             }
         });
-
-
-
 
 
         int albumPosition = getIntent().getIntExtra("album_position", 0);
@@ -276,19 +260,6 @@ public class ImageActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 launchSlideshowActivity();
-            }
-        });
-        editTextStartDate.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showStartDatePickerDialog();
-            }
-        });
-
-        editTextEndDate.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showEndDatePickerDialog();
             }
         });
 
@@ -392,11 +363,71 @@ public class ImageActivity extends AppCompatActivity {
 
         });
 
+    }
 
 
+    private void setupAutoCompleteTextViews() {
+        Set<String> personTags = CurrentUser.getInstance().getUser().getAllPersonTagValues();
+        Set<String> locationTags = CurrentUser.getInstance().getUser().getAllLocationTagValues();
 
+        ArrayAdapter<String> personAdapter = new ArrayAdapter<>(this,
+                android.R.layout.simple_dropdown_item_1line, new ArrayList<>(personTags));
+        ArrayAdapter<String> locationAdapter = new ArrayAdapter<>(this,
+                android.R.layout.simple_dropdown_item_1line, new ArrayList<>(locationTags));
 
+        personAutoCompleteTextView.setAdapter(personAdapter);
+        locationAutoCompleteTextView.setAdapter(locationAdapter);
 
+        personAutoCompleteTextView.setThreshold(1); //start searching from one character
+        locationAutoCompleteTextView.setThreshold(1); //start searching from one character
+
+        personAutoCompleteTextView.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after)
+            {
+                updatePersonTags(personAdapter);
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                personAdapter.getFilter().filter(s);
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+            }
+
+            private void updatePersonTags(ArrayAdapter<String> adapter) {
+                Set<String> newTags = CurrentUser.getInstance().getUser().getAllPersonTagValues();
+                adapter.clear();
+                adapter.addAll(newTags);
+                adapter.notifyDataSetChanged();
+            }
+
+        });
+
+        locationAutoCompleteTextView.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                updateLocationTags(locationAdapter);
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                locationAdapter.getFilter().filter(s);
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+            }
+
+            private void updateLocationTags(ArrayAdapter<String> adapter) {
+                Set<String> newTags = CurrentUser.getInstance().getUser().getAllLocationTagValues();
+                adapter.clear();
+                adapter.addAll(newTags);
+                adapter.notifyDataSetChanged();
+            }
+        });
     }
 
     private void showCreateAlbumDialog() {

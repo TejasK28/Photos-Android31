@@ -114,12 +114,18 @@ public class Picture implements Serializable {
 
     public ArrayList<String> getAllPersonTagValues()
     {
+        if (person == null) {
+            return new ArrayList<String>();
+        }
         return (ArrayList<String>) person.getValues();
     }
 
 
     public ArrayList<String> getAllLocationTagValues()
     {
+        if (location == null) {
+            return new ArrayList<String>();
+        }
         return (ArrayList<String>) location.getValues();
     }
 
