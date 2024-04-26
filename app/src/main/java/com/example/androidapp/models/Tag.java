@@ -103,7 +103,8 @@ public class Tag implements Serializable {
      * @param tagValue the value to add
      */
     public void addValue(String tagValue) {
-        this.values.add(tagValue);
+        if(!tagValue.equals(""))
+            this.values.add(tagValue);
     }
 
     /**

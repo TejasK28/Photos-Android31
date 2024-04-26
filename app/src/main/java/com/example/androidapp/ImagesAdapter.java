@@ -52,8 +52,7 @@ public class ImagesAdapter extends RecyclerView.Adapter<ImagesAdapter.ViewHolder
         new LoadImage(holder.imageViewPicture, context).execute(picture.getImagePath());
         holder.textViewImageName.setText(new java.io.File(picture.getImagePath()).getName());
         holder.textViewCaption.setText(picture.getCaption());
-        holder.textViewDate.setText(picture.getCaptureDate());
-      
+
 
         holder.deleteButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -68,14 +67,14 @@ public class ImagesAdapter extends RecyclerView.Adapter<ImagesAdapter.ViewHolder
         });
 
         // Set tags if they exist
-        if (picture.getTagPersonValue() != null && !picture.getTagPersonValue().isEmpty()) {
-            holder.textViewPersonTag.setText("Person: " + picture.getTagPersonValue());
+        if (picture.person.getValues() != null && !picture.person.getValues().isEmpty()) {
+            holder.textViewPersonTag.setText("Person: " + String.join(",",picture.person.getValues()));
         } else {
             holder.textViewPersonTag.setText(""); // Clear if no tag
         }
 
-        if (picture.getTagLocationValue() != null && !picture.getTagLocationValue().isEmpty()) {
-            holder.textViewLocationTag.setText("Location: " + picture.getTagLocationValue());
+        if (picture.location.getValues() != null && !picture.location.getValues().isEmpty()) {
+            holder.textViewLocationTag.setText("Location: " + String.join(",", picture.location.getValues()));
         } else {
             holder.textViewLocationTag.setText(""); // Clear if no tag
         }
@@ -121,6 +120,7 @@ public class ImagesAdapter extends RecyclerView.Adapter<ImagesAdapter.ViewHolder
 
         builder.show();
     }
+
 
 
     public class ViewHolder extends RecyclerView.ViewHolder {
@@ -172,11 +172,11 @@ public class ImagesAdapter extends RecyclerView.Adapter<ImagesAdapter.ViewHolder
             inputLocation.setHint("Location Tag");
 
             // Pre-set existing tag values if they exist
-            if (picture.getTagPersonValue() != null && !picture.getTagPersonValue().isEmpty()) {
-                inputPerson.setText(picture.getTagPersonValue());
+            if (picture.person.getValues() != null && !picture.person.getValues().isEmpty()) {
+                inputPerson.setText(String.join(",", picture.person.getValues()));
             }
-            if (picture.getTagLocationValue() != null && !picture.getTagLocationValue().isEmpty()) {
-                inputLocation.setText(picture.getTagLocationValue());
+            if (picture.location.getValues()!= null && !picture.location.getValues().isEmpty()) {
+                inputLocation.setText(String.join(",", picture.location.getValues()));
             }
 
             LinearLayout layout = new LinearLayout(itemView.getContext());
@@ -200,8 +200,11 @@ public class ImagesAdapter extends RecyclerView.Adapter<ImagesAdapter.ViewHolder
         private void addTag(String personTag, String locationTag, int position) {
             Picture picture = images.get(position);
 
-            picture.setTagPersonValue(personTag);
-            picture.setTagLocationValue(locationTag);
+            String [] personValues = personTag.split(",");
+            String [] locationValues = locationTag.split(",");
+
+            picture.addValuesToTag("person", personValues);
+            picture.addValuesToTag("location", locationValues);
 
             UserUtility.saveUser(context, CurrentUser.getInstance().getUser(), "me.ser");
             notifyItemChanged(position);  // Notify to refresh the item

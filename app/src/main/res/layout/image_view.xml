@@ -44,15 +44,30 @@
         android:orientation="horizontal">
 
         <EditText
-            android:id="@+id/tagTextField"
-            android:layout_width="181dp"
+            android:id="@+id/personEditText"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:hint="Type Tags"
+            android:layout_weight="1"
+            android:hint="Person"
+            android:inputType="text" />
+
+        <Spinner
+            android:id="@+id/filterSpinner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+        </Spinner>
+
+        <EditText
+            android:id="@+id/locationEditText"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="Location"
             android:inputType="text" />
 
         <Button
             android:id="@+id/searchButton"
-            android:layout_width="154dp"
+            android:layout_width="100dp"
             android:layout_height="wrap_content"
             android:text="Search" />
 

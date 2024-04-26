@@ -39,59 +39,6 @@ public class Album implements Serializable {
     private List<Picture> pictures;
 
 
-
-    /**
-     * Constructs a new Album with the specified name, cover image path, and picture details.
-     *
-     * @param name the name of the album
-     * @param coverImagePath the path to the cover image
-     * @param imagePaths the paths to the pictures in the album
-     * @param captions the captions of the pictures
-     * @param dates the capture dates of the pictures
-     */
-    public Album(String name, String coverImagePath, String[] imagePaths, String [] captions, String [] dates) {
-
-        System.out.println("Cover Image: " + coverImagePath);
-
-
-        this.name = name;
-        this.coverImagePath = coverImagePath;
-        this.pictures = new ArrayList<>();
-        int imageIndex = 0;
-
-
-
-        for (String path : imagePaths)
-        {
-            // Check if the picture already exists in GlobalPicture.allPictures
-            Picture existingPicture = GlobalPicture.allPictures.stream()
-                    .filter(p -> p.getImagePath().equals(path))
-                    .findFirst()
-                    .orElse(null);
-
-            if (existingPicture == null)
-            {
-                // If the picture does not exist, create a new one and add it to GlobalPicture.allPictures
-                //we are setting the caption
-                Picture newPicture = new Picture(path, captions[imageIndex], dates[imageIndex]);
-                ++imageIndex;
-
-                this.pictures.add(newPicture);
-                GlobalPicture.allPictures.add(newPicture);
-
-                System.out.println("NEW PICTURE ADDED TO CURRENT ALBUM AND GLOBAL ALBUM");
-            }
-            else
-            {
-                // If the picture exists, use the existing reference
-                this.pictures.add(existingPicture);
-                System.out.println("EXISTING PICTURE RETURNED");
-            }
-        }
-    }
-
-
-
     /**
      * Constructs a new Album with the specified name and list of pictures.
      *
@@ -115,106 +62,6 @@ public class Album implements Serializable {
         this.name = name;
     }
 
-
-    /**
-     * Searches for pictures within a specific date range.
-     *
-     * @param startDate the start date of the range
-     * @param endDate the end date of the range
-     * @return a list of pictures captured within the specified date range
-     */
-    public List<Picture> searchPicturesByDateRange(LocalDate startDate, LocalDate endDate) {
-        return pictures.stream()
-                .filter(picture -> {
-                    LocalDate captureDate = picture.getCaptureDateAsLocalDate();
-                    System.out.println("The pucture date is: " + captureDate);
-                    return captureDate != null && !captureDate.isBefore(startDate) && !captureDate.isAfter(endDate);
-                })
-                .collect(Collectors.toList());
-    }
-
-
-    /**
-     * Searches for pictures by tag type-value pairs.
-     *
-     * @param searchQuery the search query in the format "tag1=value1 AND/OR tag2=value2"
-     * @return a list of pictures that match the search criteria
-     */
-    public List<Picture> searchPicturesByTag(String searchQuery) {
-        // Split the query into parts to determine if it's a single search, AND, or OR search
-        String[] parts = searchQuery.split(" ");
-
-        // Handle single tag-value pair
-        if (parts.length == 1) {
-            // print single tag
-            System.out.println("Single tag");
-            return searchSingleTag(parts[0]);
-        } else if (parts.length == 3) { // Handle AND / OR
-            String operation = parts[1]; // AND or OR
-            if ("AND".equalsIgnoreCase(operation)) {
-                // print AND
-                System.out.println("AND");
-                return searchAnd(parts[0], parts[2]);
-            } else if ("OR".equalsIgnoreCase(operation)) {
-                // print OR
-                System.out.println("OR");
-                return searchOr(parts[0], parts[2]);
-            }
-        }
-
-        throw new IllegalArgumentException("Invalid search query");
-    }
-
-    /**
-     * Searches for pictures by a single tag-value pair.
-     * @param tagValuePair
-     * @return a list of pictures that match the search criteria
-     */
-    private List<Picture> searchSingleTag(String tagValuePair) {
-        String[] parts = tagValuePair.split("=");
-        String tagName = parts[0];
-        String tagValue = parts[1];
-
-
-        return pictures.stream()
-                .filter(picture -> picture.getTags().stream()
-                        .anyMatch(tag -> tag.getName().equalsIgnoreCase(tagName) && tag.getValues().contains(tagValue)))
-                .collect(Collectors.toList());
-    }
-
-    /**
-     * Searches for pictures by two tag-value pairs with an AND operation.
-     * @param firstPair
-     * @param secondPair
-     * @return a list of pictures that match the search criteria
-     */
-    private List<Picture> searchAnd(String firstPair, String secondPair) {
-        List<Picture> firstSearchResults = searchSingleTag(firstPair);
-        return firstSearchResults.stream()
-                .filter(picture -> picture.getTags().stream()
-                        .anyMatch(tag -> {
-                            String[] parts = secondPair.split("=");
-                            String tagName = parts[0];
-                            String tagValue = parts[1];
-                            return tag.getName().equalsIgnoreCase(tagName) && tag.getValues().contains(tagValue);
-                        }))
-                .collect(Collectors.toList());
-    }
-
-    /**
-     * Searches for pictures by two tag-value pairs with an OR operation.
-     * @param firstPair
-     * @param secondPair
-     * @return a list of pictures that match the search criteria
-     */
-    private List<Picture> searchOr(String firstPair, String secondPair) {
-        List<Picture> firstSearchResults = searchSingleTag(firstPair);
-        List<Picture> secondSearchResults = searchSingleTag(secondPair);
-
-        return Stream.concat(firstSearchResults.stream(), secondSearchResults.stream())
-                .distinct()
-                .collect(Collectors.toList());
-    }
 
 
     /**
@@ -292,25 +139,7 @@ public class Album implements Serializable {
     }
 
 
-    /**
-     * Returns the date range of the pictures in the album.
-     * @return the date range of the pictures in the album
-     */
-    public String getDateRange() {
-        List<LocalDate> validDates = pictures.stream()
-                .map(Picture::getCaptureDateAsLocalDate)
-                .filter(Objects::nonNull) // Filter out null dates
-                .collect(Collectors.toList());
 
-        if (validDates.isEmpty()) {
-            return "No Valid Dates Available";
-        }
-
-        LocalDate earliest = validDates.stream().min(LocalDate::compareTo).get();
-        LocalDate latest = validDates.stream().max(LocalDate::compareTo).get();
-
-        return String.format("From %s to %s", earliest.toString(), latest.toString());
-    }
 
     public void removeImage(Picture picture) {
 

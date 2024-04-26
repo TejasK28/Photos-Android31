@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 
 import android.content.DialogInterface;
@@ -13,6 +14,7 @@ import android.database.CursorWindowAllocationException;
 import android.os.Bundle;
 import android.text.InputType;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -33,11 +35,13 @@ import java.util.Locale;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import android.content.Intent;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.example.androidapp.UserUtility;
@@ -64,63 +68,64 @@ public class ImageActivity extends AppCompatActivity {
 
     public Button moveImageButton;
 
-    private EditText tagTextField;
 
-
-
-
-    private HashMap<String, List<String>> parseSearchQuery(String query) {
-        HashMap<String, List<String>> tags = new HashMap<>();
-        query = query.toLowerCase(Locale.ROOT).trim();
-
-        String[] conditions = query.split("\\s+or\\s+");
-
-        for (String condition : conditions) {
-            String[] parts = condition.split("=");
-            if (parts.length == 2) {
-                String key = parts[0].trim();
-                String value = parts[1].trim();
-                tags.computeIfAbsent(key, k -> new ArrayList<>()).add(value);
-            }
-        }
-
-        return tags;
-    }
-
-
+    private EditText personEditText;
+    private Spinner filterSpinner;
+    private EditText locationEditText;
 
     private void searchImages() {
-        String query = tagTextField.getText().toString();
-        if (query.trim().isEmpty()) {
+        String personTags = personEditText.getText().toString().trim();
+        String locationTags = locationEditText.getText().toString().trim();
+
+        // Check if both input fields are empty
+        if (personTags.isEmpty() && locationTags.isEmpty()) {
+            // Directly reset the RecyclerView to show all images from the selected album
             imagesAdapter = new ImagesAdapter(this, selectedAlbum.getImages());
             recyclerViewImages.setAdapter(imagesAdapter);
+            recyclerViewImages.scrollToPosition(0); // Optionally, scroll to the top of the list
             return;
         }
 
-        HashMap<String, List<String>> tags = parseSearchQuery(query);
-        List<Picture> filteredPictures = new ArrayList<>();
-        for (Album album : CurrentUser.getInstance().getUser().getAlbums()) {
-            for (Picture picture : album.getImages()) {
-                boolean personMatches = checkMatches(picture.getTagPersonValue(), tags.get("person"));
-                boolean locationMatches = checkMatches(picture.getTagLocationValue(), tags.get("location"));
+        // Split the input strings into lists based on commas, considering spaces around commas
+        List<String> personList = Arrays.asList(personTags.split("\\s*,\\s*"));
+        List<String> locationList = Arrays.asList(locationTags.split("\\s*,\\s*"));
 
-                if (personMatches || locationMatches) {
+        // Proceed to filter pictures
+        List<Picture> filteredPictures = new ArrayList<>();
+        User user = CurrentUser.getInstance().getUser();
+        for (Album album : user.getAlbums()) {
+            for (Picture picture : album.getImages()) {
+                if (matchesTags(picture.getPersonTags(), personList) || matchesTags(picture.getLocationTags(), locationList)) {
                     filteredPictures.add(picture);
                 }
             }
         }
 
+        // Update RecyclerView with the filtered pictures
         imagesAdapter = new ImagesAdapter(this, filteredPictures);
         recyclerViewImages.setAdapter(imagesAdapter);
+        recyclerViewImages.scrollToPosition(0); // Optionally, scroll to the top of the list
     }
 
-    private boolean checkMatches(String tagValue, List<String> values) {
-        if (values == null || tagValue == null) return false;
-        return values.stream().anyMatch(value -> tagValue.equalsIgnoreCase(value));
+    private boolean matchesTags(List<String> pictureTags, List<String> searchTags) {
+        if (searchTags.isEmpty() || (searchTags.size() == 1 && searchTags.get(0).isEmpty())) {
+            // If search tags are empty, return false as we don't want to show all pictures
+            return false;
+        }
+
+        // Convert list of picture tags to lower case for case insensitive comparison
+        List<String> lowerCasePictureTags = new ArrayList<>();
+        for (String tag : pictureTags) {
+            lowerCasePictureTags.add(tag.toLowerCase());
+        }
+
+        for (String searchTag : searchTags) {
+            if (lowerCasePictureTags.contains(searchTag.trim().toLowerCase())) {
+                return true;
+            }
+        }
+        return false;
     }
-
-
-
 
 
 
@@ -132,13 +137,21 @@ public class ImageActivity extends AppCompatActivity {
         editTextEndDate = findViewById(R.id.editTextEndDate);
         moveImageButton = findViewById(R.id.moveImageButton);
         searchButton = findViewById(R.id.searchButton);
-        tagTextField = findViewById(R.id.tagTextField);
+
+        personEditText = findViewById(R.id.personEditText);
+        filterSpinner = findViewById(R.id.filterSpinner);
+        locationEditText = findViewById(R.id.locationEditText);
+
+        setupFilterSpinner();
+
+
 
         searchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 searchImages();
             }
+
         });
 
 
@@ -303,6 +316,20 @@ public class ImageActivity extends AppCompatActivity {
 
 
 
+    }
+
+    private void setupFilterSpinner() {
+        // Define the values for the spinner
+        String[] filterOptions = new String[]{"NONE", "AND", "OR"};
+
+        // Create an ArrayAdapter using the string array and a default spinner layout
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, filterOptions);
+
+        // Specify the layout to use when the list of choices appears
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+        // Apply the adapter to the spinner
+        filterSpinner.setAdapter(adapter);
     }
 
     private void openImageSelector() {
