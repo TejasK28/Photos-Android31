@@ -49,7 +49,7 @@
 
     <ScrollView
         android:layout_width="398dp"
-        android:layout_height="508dp">
+        android:layout_height="300dp">
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerViewImages"
@@ -75,7 +75,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Start Slideshow" />
- </LinearLayout>
+    </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"

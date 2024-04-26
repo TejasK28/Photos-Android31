@@ -48,8 +48,7 @@ public class ImageActivity extends AppCompatActivity {
     private Button createAlbumButton; // Button to create album from search results
 
     private static final int PICK_IMAGE_REQUEST = 1;  // Request code for picking an image
-    private EditText editTextStartDate;
-    private EditText editTextEndDate;
+
     private Album selectedAlbum;
     private RecyclerView recyclerViewImages;
     private ImagesAdapter imagesAdapter;
@@ -62,6 +61,8 @@ public class ImageActivity extends AppCompatActivity {
 
     AutoCompleteTextView personAutoCompleteTextView;
     AutoCompleteTextView locationAutoCompleteTextView;
+
+    private AlbumsAdapter albumsAdapter; // Adapter for managing the display of albums
 
     public boolean doesPictureHaveTag(Picture p, String whichTag, String desiredValue)
     {
@@ -202,7 +203,6 @@ public class ImageActivity extends AppCompatActivity {
 
         setupAutoCompleteTextViews();
         setupFilterSpinner();
-
 
 
         searchButton.setOnClickListener(new View.OnClickListener() {
@@ -466,11 +466,24 @@ public class ImageActivity extends AppCompatActivity {
 
 
 
+//    private void createNewAlbum(String albumName, List<Picture> pictures) {
+//        Album newAlbum = new Album(albumName, pictures);
+//        CurrentUser.getInstance().getUser().getAlbums().add(newAlbum);
+//        UserUtility.saveUser(this, CurrentUser.getInstance().getUser(), "me.ser");
+//        Toast.makeText(this, "New album created: " + albumName, Toast.LENGTH_SHORT).show();
+//    }
+
     private void createNewAlbum(String albumName, List<Picture> pictures) {
         Album newAlbum = new Album(albumName, pictures);
+
+        // FIXME find a way to update the album view after creating an album
+
+        // Update the RecyclerView to reflect the new album
+        //AlbumsAdapter.albumsList.add(newAlbum);
         CurrentUser.getInstance().getUser().getAlbums().add(newAlbum);
         UserUtility.saveUser(this, CurrentUser.getInstance().getUser(), "me.ser");
-        // FIXME find a way to update the album view after creating an album
+
+
         Toast.makeText(this, "New album created: " + albumName, Toast.LENGTH_SHORT).show();
     }
 
@@ -568,43 +581,7 @@ public class ImageActivity extends AppCompatActivity {
     }
 
 
-    private void showStartDatePickerDialog() {
-        // Get the current date
-        final Calendar c = Calendar.getInstance();
-        int year = c.get(Calendar.YEAR);
-        int month = c.get(Calendar.MONTH);
-        int day = c.get(Calendar.DAY_OF_MONTH);
 
-        DatePickerDialog datePickerDialog = new DatePickerDialog(this,
-                new DatePickerDialog.OnDateSetListener() {
-                    @Override
-                    public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-                        // Month is zero based, just add 1
-                        String formattedDate = String.format(Locale.getDefault(), "%d-%02d-%02d", year, monthOfYear + 1, dayOfMonth);
-                        editTextStartDate.setText(formattedDate);
-                    }
-                }, year, month, day);
-        datePickerDialog.show();
-    }
-
-    private void showEndDatePickerDialog() {
-        // Get the current date
-        final Calendar c = Calendar.getInstance();
-        int year = c.get(Calendar.YEAR);
-        int month = c.get(Calendar.MONTH);
-        int day = c.get(Calendar.DAY_OF_MONTH);
-
-        DatePickerDialog datePickerDialog = new DatePickerDialog(this,
-                new DatePickerDialog.OnDateSetListener() {
-                    @Override
-                    public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-                        // Month is zero based, just add 1
-                        String formattedDate = String.format(Locale.getDefault(), "%d-%02d-%02d", year, monthOfYear + 1, dayOfMonth);
-                        editTextEndDate.setText(formattedDate);
-                    }
-                }, year, month, day);
-        datePickerDialog.show();
-    }
 
 
 

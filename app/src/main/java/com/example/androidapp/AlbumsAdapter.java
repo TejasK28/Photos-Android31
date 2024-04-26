@@ -15,7 +15,7 @@ import com.example.androidapp.models.CurrentUser;
 
 
 public class AlbumsAdapter extends RecyclerView.Adapter<AlbumsAdapter.ViewHolder> {
-    public ArrayList<Album> albumsList;
+    public static ArrayList<Album> albumsList;
 
     public AlbumsAdapter(ArrayList<Album> albums) {
         this.albumsList = albums;
@@ -118,5 +118,10 @@ public class AlbumsAdapter extends RecyclerView.Adapter<AlbumsAdapter.ViewHolder
         }
 
         return names;
+    }
+
+    public void update()
+    {
+        notifyDataSetChanged();
     }
 }

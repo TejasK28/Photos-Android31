@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.text.InputType;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -26,6 +27,9 @@ public class MainActivity extends AppCompatActivity {
     private Button addAlbumButton;
     private Button removeAlbumButton;
     private SharedPreferences sharedPreferences;
+
+    Button refreshButton;
+
 
     private User user;
 
@@ -53,7 +57,21 @@ public class MainActivity extends AppCompatActivity {
 
         addAlbumButton.setOnClickListener(v -> showAddAlbumDialog());
         removeAlbumButton.setOnClickListener(v -> handleRemoveAlbum());
+
+        refreshButton = findViewById(R.id.btnRefreshView);
+        refreshButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                refreshAlbums();
+            }
+        });
     }
+
+    private void refreshAlbums() {
+        // Assuming you have a method to fetch new data if needed
+        albumsAdapter.notifyDataSetChanged(); // Notify the adapter to refresh views
+    }
+
 
     private void showAddAlbumDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
