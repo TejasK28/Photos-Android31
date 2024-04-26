@@ -15,7 +15,7 @@ import com.example.androidapp.models.CurrentUser;
 
 
 public class AlbumsAdapter extends RecyclerView.Adapter<AlbumsAdapter.ViewHolder> {
-    private ArrayList<Album> albumsList;
+    public ArrayList<Album> albumsList;
 
     public AlbumsAdapter(ArrayList<Album> albums) {
         this.albumsList = albums;

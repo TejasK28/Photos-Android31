@@ -71,6 +71,7 @@
             android:layout_height="wrap_content"
             android:text="Search" />
 
+
     </LinearLayout>
 
     <ScrollView
@@ -101,8 +102,8 @@
 
         <Button
             android:id="@+id/addImageButton"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_width="116dp"
+            android:layout_height="108dp"
             android:layout_weight="1"
             android:text="Add" />
 
@@ -118,6 +119,15 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Start Slideshow" />
+
+        <Button
+            android:id="@+id/createAlbumButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/searchButton"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="16dp"
+            android:text="Create Album from Search" />
     </LinearLayout>
 
 </LinearLayout>

@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.database.CursorWindowAllocationException;
@@ -53,7 +54,9 @@ import org.w3c.dom.Text;
 // If your min API level is below 26
 
 public class ImageActivity extends AppCompatActivity {
-    // Existing declarations...
+
+    private Button createAlbumButton; // Button to create album from search results
+
     private static final int PICK_IMAGE_REQUEST = 1;  // Request code for picking an image
     private Button searchByDateButton;
 
@@ -220,6 +223,18 @@ public class ImageActivity extends AppCompatActivity {
 
         });
 
+        createAlbumButton = findViewById(R.id.createAlbumButton);
+        createAlbumButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (imagesAdapter.getItemCount() > 0) {
+                    showCreateAlbumDialog();
+                } else {
+                    Toast.makeText(ImageActivity.this, "No images to include in a new album.", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
 
 
 
@@ -383,6 +398,49 @@ public class ImageActivity extends AppCompatActivity {
 
 
     }
+
+    private void showCreateAlbumDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Create New Album");
+
+        final EditText input = new EditText(this);
+        input.setInputType(InputType.TYPE_CLASS_TEXT);
+        builder.setView(input);
+
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                String albumName = input.getText().toString().trim();
+                if (!albumName.isEmpty() && !albumExists(albumName)) {
+                    createNewAlbum(albumName, imagesAdapter.getCurrentList());
+                } else {
+                    Toast.makeText(ImageActivity.this, "Album already exists or invalid name.", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
+        builder.show();
+    }
+
+    private boolean albumExists(String albumName) {
+        User user = CurrentUser.getInstance().getUser();
+        return user.getAlbums().stream().anyMatch(album -> album.getName().equalsIgnoreCase(albumName));
+    }
+
+
+
+
+
+    private void createNewAlbum(String albumName, List<Picture> pictures) {
+        Album newAlbum = new Album(albumName, pictures);
+        CurrentUser.getInstance().getUser().getAlbums().add(newAlbum);
+        UserUtility.saveUser(this, CurrentUser.getInstance().getUser(), "me.ser");
+        // FIXME find a way to update the album view after creating an album
+        Toast.makeText(this, "New album created: " + albumName, Toast.LENGTH_SHORT).show();
+    }
+
+
 
     private void setupFilterSpinner() {
         // Define the values for the spinner

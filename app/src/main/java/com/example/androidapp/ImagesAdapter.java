@@ -121,6 +121,9 @@ public class ImagesAdapter extends RecyclerView.Adapter<ImagesAdapter.ViewHolder
         builder.show();
     }
 
+    public List<Picture> getCurrentList() {
+        return images;
+    }
 
 
     public class ViewHolder extends RecyclerView.ViewHolder {
