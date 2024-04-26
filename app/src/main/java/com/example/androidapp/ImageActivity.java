@@ -62,7 +62,6 @@ public class ImageActivity extends AppCompatActivity {
     AutoCompleteTextView personAutoCompleteTextView;
     AutoCompleteTextView locationAutoCompleteTextView;
 
-    private AlbumsAdapter albumsAdapter; // Adapter for managing the display of albums
 
     public boolean doesPictureHaveTag(Picture p, String whichTag, String desiredValue)
     {
@@ -463,15 +462,6 @@ public class ImageActivity extends AppCompatActivity {
     }
 
 
-
-
-
-//    private void createNewAlbum(String albumName, List<Picture> pictures) {
-//        Album newAlbum = new Album(albumName, pictures);
-//        CurrentUser.getInstance().getUser().getAlbums().add(newAlbum);
-//        UserUtility.saveUser(this, CurrentUser.getInstance().getUser(), "me.ser");
-//        Toast.makeText(this, "New album created: " + albumName, Toast.LENGTH_SHORT).show();
-//    }
 
     private void createNewAlbum(String albumName, List<Picture> pictures) {
         Album newAlbum = new Album(albumName, pictures);

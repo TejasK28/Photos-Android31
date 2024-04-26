@@ -27,6 +27,8 @@ import java.io.IOException;
 import android.net.Uri;
 import java.io.FileNotFoundException;
 import android.util.Log;
+import android.widget.Toast;
+
 import com.example.androidapp.models.CurrentUser;
 import com.example.androidapp.UserUtility;
 
@@ -57,14 +59,20 @@ public class ImagesAdapter extends RecyclerView.Adapter<ImagesAdapter.ViewHolder
         holder.deleteButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Remove the item from the dataset
-                images.remove(position);
-                // Notify the adapter of the item removed
-                UserUtility.saveUser(context, CurrentUser.getInstance().getUser(), "me.ser");
-                notifyItemRemoved(position);
-                notifyItemRangeChanged(position, images.size());
+                if (images.size() > 1) {
+                    // Remove the item from the dataset
+                    images.remove(position);
+                    // Notify the adapter of the item removed
+                    notifyItemRemoved(position);
+                    notifyItemRangeChanged(position, images.size());
+                    UserUtility.saveUser(context, CurrentUser.getInstance().getUser(), "me.ser");
+                } else {
+                    // Display toast message
+                    Toast.makeText(context, "Cannot delete. Albums must contain at least one image.", Toast.LENGTH_LONG).show();
+                }
             }
         });
+
 
         // Set tags if they exist
         if (picture.person.getValues() != null && !picture.person.getValues().isEmpty()) {
