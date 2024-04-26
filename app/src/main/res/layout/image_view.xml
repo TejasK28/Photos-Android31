@@ -46,60 +46,55 @@
 
     </LinearLayout>
 
+
     <ScrollView
-        android:layout_width="383dp"
-        android:layout_height="204dp">
+        android:layout_width="398dp"
+        android:layout_height="508dp">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="470dp"
-            android:orientation="vertical">
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recyclerViewImages"
-                android:layout_width="371dp"
-                android:layout_height="292dp" />
-
-        </LinearLayout>
-
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerViewImages"
+            android:layout_width="371dp"
+            android:layout_height="292dp" />
     </ScrollView>
 
-
     <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="269dp"
-        android:gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="fill"
         android:orientation="horizontal"
         android:padding="10dp">
 
         <Button
             android:id="@+id/addImageButton"
-            android:layout_width="116dp"
-            android:layout_height="108dp"
-            android:layout_weight="1"
-            android:text="Add" />
-
-        <Button
-            android:id="@+id/moveImageButton"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Move Image" />
+            android:text="Add" />
 
         <Button
             android:id="@+id/startSlideshowButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Start Slideshow" />
+ </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="43dp"
+        android:gravity="fill"
+        android:orientation="horizontal">
 
         <Button
             android:id="@+id/createAlbumButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/searchButton"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="16dp"
             android:text="Create Album from Search" />
+
+        <Button
+            android:id="@+id/moveImageButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Move Image" />
     </LinearLayout>
 
 </LinearLayout>
