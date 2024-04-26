@@ -130,7 +130,10 @@ public class ImageActivity extends AppCompatActivity {
 
 
 
-
+        if (!personTags.isEmpty() && !locationTags.isEmpty()) {
+            Toast.makeText(this, "Only one tag field can be filled out.", Toast.LENGTH_LONG).show();
+            return;
+        }
 
 
         // Check if both input fields are empty
