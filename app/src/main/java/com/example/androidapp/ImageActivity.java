@@ -73,9 +73,75 @@ public class ImageActivity extends AppCompatActivity {
     private Spinner filterSpinner;
     private EditText locationEditText;
 
+    public boolean doesPictureHaveTag(Picture p, String whichTag, String desiredValue)
+    {
+        if(whichTag.equals("person"))
+        {
+            return p.person.getValues().contains(desiredValue);
+        }
+
+        return p.location.getValues().contains(desiredValue);
+    }
+
     private void searchImages() {
+        String selectedLogic = filterSpinner.getSelectedItem().toString();
         String personTags = personEditText.getText().toString().trim();
         String locationTags = locationEditText.getText().toString().trim();
+
+        if(selectedLogic.equals("AND"))
+        {
+            if (personTags.isEmpty() || locationTags.isEmpty()) {
+                Toast.makeText(this, "Both person and location fields must be filled for 'AND' logic.", Toast.LENGTH_LONG).show();
+                return;
+            }
+            // Proceed to filter pictures
+            List<Picture> filteredPictures = new ArrayList<>();
+            User user = CurrentUser.getInstance().getUser();
+            for (Album album : user.getAlbums()) {
+                for (Picture picture : album.getImages()) {
+                    if (doesPictureHaveTag(picture, "person", personTags) && doesPictureHaveTag(picture, "location", locationTags)) {
+                        filteredPictures.add(picture);
+                    }
+                }
+            }
+
+            // Update RecyclerView with the filtered pictures
+            imagesAdapter = new ImagesAdapter(this, filteredPictures);
+            recyclerViewImages.setAdapter(imagesAdapter);
+            recyclerViewImages.scrollToPosition(0);
+
+            return;
+        }
+
+        if(selectedLogic.equals("OR"))
+        {
+            if (personTags.isEmpty() || locationTags.isEmpty()) {
+                Toast.makeText(this, "At least one of person or location must be filled for 'OR' logic.", Toast.LENGTH_LONG).show();
+                return;
+            }
+            // Proceed to filter pictures
+            List<Picture> filteredPictures = new ArrayList<>();
+            User user = CurrentUser.getInstance().getUser();
+            for (Album album : user.getAlbums()) {
+                for (Picture picture : album.getImages()) {
+                    if (doesPictureHaveTag(picture, "person", personTags) || doesPictureHaveTag(picture, "location", locationTags)) {
+                        filteredPictures.add(picture);
+                    }
+                }
+            }
+
+            // Update RecyclerView with the filtered pictures
+            imagesAdapter = new ImagesAdapter(this, filteredPictures);
+            recyclerViewImages.setAdapter(imagesAdapter);
+            recyclerViewImages.scrollToPosition(0);
+
+            return;
+        }
+
+
+
+
+
 
         // Check if both input fields are empty
         if (personTags.isEmpty() && locationTags.isEmpty()) {
