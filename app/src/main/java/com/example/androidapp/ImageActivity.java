@@ -566,15 +566,22 @@ public class ImageActivity extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 String caption = input.getText().toString();
-                // Create a new Picture instance with the caption
-                Picture newPicture = new Picture(imageUri.toString(), caption);
-                selectedAlbum.addImage(newPicture);
-                System.out.println("SelectedAlbum: " + selectedAlbum.getImagesPath());
-                UserUtility.saveUser(ImageActivity.this, CurrentUser.getInstance().getUser(), "me.ser");
-                imagesAdapter.notifyDataSetChanged();
-                System.out.println("CURRENT IMAGES:" + selectedAlbum.getImages());
+                String imageFileName = new File(imageUri.getPath()).getName();
 
+                // Check if the image file name already exists in the selected album
+                boolean duplicateExists = selectedAlbum.getImages().stream()
+                        .anyMatch(picture -> new File(Uri.parse(picture.getImagePath()).getPath()).getName().equals(imageFileName));
 
+                if (duplicateExists) {
+                    Toast.makeText(ImageActivity.this, "Cannot add duplicate image.", Toast.LENGTH_LONG).show();
+                } else {
+                    // Create a new Picture instance with the caption
+                    Picture newPicture = new Picture(imageUri.toString(), caption);
+                    selectedAlbum.addImage(newPicture);
+                    UserUtility.saveUser(ImageActivity.this, CurrentUser.getInstance().getUser(), "me.ser");
+                    imagesAdapter.notifyDataSetChanged();
+                    Toast.makeText(ImageActivity.this, "Image added successfully!", Toast.LENGTH_SHORT).show();
+                }
             }
         });
         builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -586,7 +593,6 @@ public class ImageActivity extends AppCompatActivity {
 
         builder.show();
     }
-
 
 
 
