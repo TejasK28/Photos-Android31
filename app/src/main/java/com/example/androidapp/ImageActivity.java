@@ -347,7 +347,7 @@ public class ImageActivity extends AppCompatActivity {
                         targetAlbum.addImage(picture); // Assumes method to add image
                         UserUtility.saveUser(ImageActivity.this, CurrentUser.getInstance().getUser(), "me.ser");
                         imagesAdapter.notifyDataSetChanged();
-                        Toast.makeText(ImageActivity.this, "Image moved successfully! Please refresh view.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(ImageActivity.this, "Image moved successfully!", Toast.LENGTH_SHORT).show();
                     }
                 });
 
@@ -486,7 +486,6 @@ public class ImageActivity extends AppCompatActivity {
             CurrentUser.getInstance().getUser().getAlbums().add(newAlbum);
             UserUtility.saveUser(this, CurrentUser.getInstance().getUser(), "me.ser");
             Toast.makeText(this, "New album created: " + albumName + " with " + newAlbum.getImages().size() + " unique images.", Toast.LENGTH_SHORT).show();
-            Toast.makeText(this, "Please refresh album view via button", Toast.LENGTH_SHORT).show();
 
         } else {
             Toast.makeText(this, "No unique images to create a new album.", Toast.LENGTH_SHORT).show();

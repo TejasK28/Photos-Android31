@@ -36,6 +36,13 @@ public class MainActivity extends AppCompatActivity {
     private ArrayList<Album> albums;
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        albumsAdapter.notifyDataSetChanged();
+    }
+
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
