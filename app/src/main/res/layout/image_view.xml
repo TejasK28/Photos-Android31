@@ -48,8 +48,8 @@
 
 
     <ScrollView
-        android:layout_width="398dp"
-        android:layout_height="300dp">
+        android:layout_width="371dp"
+        android:layout_height="297dp">
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerViewImages"
