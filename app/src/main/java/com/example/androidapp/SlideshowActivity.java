@@ -1,12 +1,11 @@
 package com.example.androidapp;
 
-
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.Button;
+import android.widget.TextView;
 import java.util.ArrayList;
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
@@ -16,12 +15,15 @@ import android.net.Uri;
 import java.io.FileNotFoundException;
 import android.widget.Toast;
 
-
 import com.example.androidapp.models.Album;
+import com.example.androidapp.models.Picture;
 
 public class SlideshowActivity extends AppCompatActivity {
     private ImageView imageView;
-    private ArrayList<String> imagePaths; // Assume this is passed or set somewhere
+    private TextView textViewCaption;
+    private TextView textViewTags;
+    private TextView textViewImageName;
+    private Album selectedAlbum;
     private int currentIndex = 0;
 
     @Override
@@ -30,9 +32,11 @@ public class SlideshowActivity extends AppCompatActivity {
         setContentView(R.layout.activity_slideshow);
 
         imageView = findViewById(R.id.imageViewSlideshow);
+        textViewCaption = findViewById(R.id.textViewCaption);
+        textViewTags = findViewById(R.id.textViewTags);
         Button buttonPrev = findViewById(R.id.buttonPrev);
         Button buttonNext = findViewById(R.id.buttonNext);
-        imagePaths = (ArrayList<String>) getIntent().getSerializableExtra("imagePaths");
+        selectedAlbum = (Album) getIntent().getSerializableExtra("selectedAlbum");
 
         // Setup button listeners
         buttonPrev.setOnClickListener(new View.OnClickListener() {
@@ -48,7 +52,7 @@ public class SlideshowActivity extends AppCompatActivity {
         buttonNext.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (currentIndex < imagePaths.size() - 1) {
+                if (currentIndex < selectedAlbum.getImages().size() - 1) {
                     currentIndex++;
                     loadImage(currentIndex);
                 }
@@ -60,11 +64,13 @@ public class SlideshowActivity extends AppCompatActivity {
     }
 
     private void loadImage(int index) {
-        String imagePath = imagePaths.get(index);
+        Picture picture = selectedAlbum.getImages().get(index);
         try {
-            Uri imageUri = Uri.parse(imagePath);
+            Uri imageUri = Uri.parse(picture.getImagePath());
             InputStream inputStream = getContentResolver().openInputStream(imageUri);
             Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+            textViewCaption.setText(picture.getCaption());
+            textViewTags.setText("Person: " + picture.getPersonTagsString() + "\n" + "Location: " + picture.getLocationTagsString());
             imageView.setImageBitmap(bitmap);
             if (inputStream != null) {
                 inputStream.close();
@@ -77,5 +83,4 @@ public class SlideshowActivity extends AppCompatActivity {
             Toast.makeText(this, "Error loading image", Toast.LENGTH_SHORT).show();
         }
     }
-
 }

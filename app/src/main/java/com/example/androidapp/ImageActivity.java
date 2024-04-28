@@ -524,7 +524,7 @@ public class ImageActivity extends AppCompatActivity {
             Toast.makeText(this, "There are no images in the album to display in a slideshow.", Toast.LENGTH_LONG).show();
         } else {
             Intent intent = new Intent(this, SlideshowActivity.class);
-            intent.putStringArrayListExtra("imagePaths", imagePaths);
+            intent.putExtra("selectedAlbum", selectedAlbum);
             startActivity(intent);
         }
     }

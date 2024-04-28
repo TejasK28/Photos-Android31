@@ -134,6 +134,14 @@ public class Picture implements Serializable {
         return person.getValues();
     }
 
+
+    public String getPersonTagsString() {
+        return String.join(", ", getPersonTags());
+    }
+
+    public String getLocationTagsString() {
+        return String.join(", ", getLocationTags());
+    }
     public List<String> getLocationTags() {
         return location.getValues();
     }
